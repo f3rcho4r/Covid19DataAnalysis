@@ -14,7 +14,7 @@ states_inverse = {v: k for k, v in states.items()}
 
 @st.cache
 def LoadData():
-    file = pd.read_csv(r"./COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
+    file = pd.read_csv(r"../COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
     df = pd.DataFrame(file)
     df['date'] = pd.to_datetime(df['date'])
     return df
@@ -59,7 +59,7 @@ with st.container():
     st.subheader('Segundo intervalo de crecimiento')
     col1, col2 = st.columns(2)
     with col1:
-        img=Image.open(r".\pages\ny_fecha2.png")
+        img=Image.open(r"../pages/ny_fecha2.png")
         st.image(img)
 
     with col2:
@@ -68,7 +68,7 @@ with st.container():
     st.subheader('Tercer intervalo de crecimiento')
     col1, col2 = st.columns(2)
     with col1:
-        img=Image.open(r".\pages\ny_fecha3.png")
+        img=Image.open(r"../pages/ny_fecha3.png")
         st.image(img)
 
     with col2:
@@ -211,7 +211,7 @@ fig.update_yaxes(title_text="Hospitales con falta de personal", secondary_y=Fals
 fig.update_yaxes(title_text="Muertes COVID", secondary_y=True)
 st.plotly_chart(fig)
 #----
-sd.header('Peor mes de la pandemia para EEUU')
+st.header('Peor mes de la pandemia para EEUU')
 cols = ['date','Camas usadas para COVID','Falta de personal','Muertos por COVID','Ocupacion UCI pediatrica','Ocupacion UCI adultos']
 df = LoadData()
 df_f = pd.DataFrame()
