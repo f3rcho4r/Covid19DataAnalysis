@@ -78,12 +78,11 @@ states = {
 
 df['date'] = pd.to_datetime(df['date'])
 df['state_name'] = df['state'].map(states)
-print(df.head(5))
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
 
 # -- Sidebar -- 
-st.sidebar.header('Please, select filters here')
+st.sidebar.header('Por favor, seleccione aquí las fechas a considerar:')
 
 date_ini = st.sidebar.date_input(
     'Seleccione la fecha de inicio del período a considerar',
@@ -106,7 +105,7 @@ if date_fin < date_ini:
 
 
 #-- Mainpage --
-st.title(":round_pushpin: Dashboard situacional")
+st.title(":hospital: Dashboard situacional COVID-19 (EEUU)")
   
 cols = ['date','state','Muertos por COVID','Camas comunes usadas para COVID', 'Camas UCI adultos usadas para COVID']
 df_sum = pd.DataFrame()
@@ -121,7 +120,7 @@ filter = st.selectbox('Seleccione un parametro a representar:',
 
 df_sum = df_sum.groupby('state').sum()
 df_sum['state'] = df_sum.index
-
+df_sum['Estado'] = df_sum.index.map(states)
 
 text = (f"{filter} por estado entre {date_ini} y {date_fin}")
 
@@ -141,7 +140,6 @@ fig.update_layout(
     width=800,
     height=600,)
 st.plotly_chart(fig)
-
 #------
 st.title('Uso de camas UCI por estado')
 
@@ -153,23 +151,24 @@ df_uci['date'] = pd.to_datetime(df_uci['date'])
 df_uci = df_uci[(df_uci['date'].dt.date >= date_ini )&(df_uci['date'].dt.date <= date_fin)]
 df_uci['Ocupacion UCI'] = round(df_uci['staffed_icu_adult_patients_confirmed_covid']/df_uci['staffed_adult_icu_bed_occupancy']*100,2)
 df_uci = df_uci.groupby(by='state').agg({'Muertes por COVID':'sum','Ocupacion UCI':'mean'})
-df_uci['states'] = df_uci.index
+df_uci['Estado'] = df_uci.index.map(states)
 
-fig = px.bar(df_uci.sort_values(by='Ocupacion UCI',ascending=False).head(10), x="states", y="Ocupacion UCI")
+fig = px.bar(df_uci.sort_values(by='Ocupacion UCI',ascending=False).head(10), x='Estado', y="Ocupacion UCI",color='Estado')
 st.plotly_chart(fig)
-with st.expander('Ver tabla completa'):
-    st.table(df_uci.sort_values(by='Ocupacion UCI',ascending=False)['Ocupacion UCI'])
 
-df_oc_de = df_uci.sort_values(by='Ocupacion UCI',ascending=False).head(5)[['states','Ocupacion UCI','Muertes por COVID']]
+with st.expander('Ver tabla completa'):
+    st.table(df_uci.sort_values(by='Ocupacion UCI',ascending=False)[['Estado','Ocupacion UCI']])
+
+df_oc_de = df_uci.sort_values(by='Ocupacion UCI',ascending=False).head(5)[['Estado','Ocupacion UCI','Muertes por COVID']]
 
 with st.container():
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Scatter(x=df_oc_de['states'].map(states),y=df_oc_de['Ocupacion UCI'], name='%Ocupacion UCI'),
+        go.Scatter(x=df_oc_de['Estado'],y=df_oc_de['Ocupacion UCI'], name='%Ocupacion UCI'),
         secondary_y=False
     )
     fig.add_trace(
-        go.Bar(x=df_oc_de['states'].map(states),y=df_oc_de['Muertes por COVID'],name='Muertos por COVID'),  
+        go.Bar(x=df_oc_de['Estado'],y=df_oc_de['Muertes por COVID'],name='Muertos por COVID'),  
         secondary_y=True
     )
     fig.update_layout(
@@ -195,7 +194,7 @@ df_cap['Ocupacion'] = round((df_cap['inpatient_bed_covid_utilization_numerator']
 df_cap = df_cap.groupby(by='state').agg({'Ocupacion':'max'}).sort_values(by='Ocupacion',ascending=False)
 df_cap['Estado'] = df_cap.index.map(states)
 
-fig = px.bar(df_cap.head(10), x="Ocupacion", y="Estado", orientation='h')
+fig = px.bar(df_cap.head(10), x="Ocupacion", y="Estado", orientation='h',color='Estado')
 st.plotly_chart(fig)
 with st.expander("Ver ranking completo"):
     st.table(df_cap[['Estado','Ocupacion']])
@@ -205,7 +204,7 @@ st.header('Cantidad de camas ocupadas por COVID')
 with st.container():
     df_hosp_state = df[(df['date'].dt.date >=date_ini )&(df['date'].dt.date<=date_fin)].groupby(by='state').sum()
     df_hosp_state['states'] = df_hosp_state.index
-        
+   
     title = (f"Cantidad de camas comunes por COVID, entre {date_ini} y {date_fin} (acumulado)")
     fig = px.choropleth(df_sum,
                         locations='state', 
@@ -216,5 +215,5 @@ with st.container():
                         title=title)
     st.plotly_chart(fig)
     with st.expander("Ver tabla completa"):
-        st.table(df_sum.sort_values(by='Camas comunes usadas para COVID',ascending=False)['Camas comunes usadas para COVID'])
+        st.table(df_sum.sort_values(by='Camas comunes usadas para COVID',ascending=False)[['Estado','Camas comunes usadas para COVID']])
     

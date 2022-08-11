@@ -12,9 +12,12 @@ import plotly.io as pio
 pio.templates.default = "plotly"
 states_inverse = {v: k for k, v in states.items()}
 
+st.set_page_config(page_title="Informe COVID-19: pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
+st.title('Informe COVID-19: pacientes y capacidad hospitalaria')
+
 @st.cache
 def LoadData():
-    file = pd.read_csv(r"../COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
+    file = pd.read_csv(r"COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
     df = pd.DataFrame(file)
     df['date'] = pd.to_datetime(df['date'])
     return df
@@ -43,8 +46,6 @@ df_ny = df_ny.sort_values(by='date')
 fig = px.line(df_ny,x='date',y='inpatient_beds_used_covid')
 st.plotly_chart(fig)
 
-path = os.path.dirname(__file__)
-st.write(path)
 
 with st.container():
     st.subheader('Primer intervalo de crecimiento')
@@ -188,24 +189,24 @@ with st.container():
                         options=df_21['Estado'].unique(),
                         default=df_21.sort_values(by='Muertos por COVID',ascending=False)['Estado'].head(1))
 
+
 title = ' '.join(state)
 state = list(map(states_inverse.get,state))
-
 
 df_selection = df_21.query('state == @state').sort_values(by='date')
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
     go.Scatter(x=df_selection['date'],y=df_selection['Falta de personal'], name='Falta de personal',),
-    secondary_y=False
-)
+    secondary_y=False)
 fig.add_trace(
     go.Scatter(x=df_selection['date'],y=df_selection['Muertos por COVID'],name='Muertos por COVID',),  
-    secondary_y=True
-)
+    secondary_y=True)
 fig.update_layout(
-    title_text="Relacion entre falta de personal y muertes por COVID en 2021"
-)
+    title_text="Relacion entre falta de personal y muertes por COVID en 2021",
+    title={
+    'x':0.41,
+    'xanchor':'center'})
 fig.update_xaxes(title_text=title)
 fig.update_yaxes(title_text="Hospitales con falta de personal", secondary_y=False)
 fig.update_yaxes(title_text="Muertes COVID", secondary_y=True)
@@ -216,44 +217,39 @@ cols = ['date','Camas usadas para COVID','Falta de personal','Muertos por COVID'
 df = LoadData()
 df_f = pd.DataFrame()
 df_f[cols] = df[['date','inpatient_beds_used_covid','critical_staffing_shortage_today_yes','deaths_covid','staffed_pediatric_icu_bed_occupancy','staffed_adult_icu_bed_occupancy']]
-#df_f['mes'] = df_f['date'].dt.to_period('M')
 df_f = df_f.sort_values(by='date')
 df_f = df_f.resample('M',on='date').sum()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig.add_trace(
     go.Scatter(x=df_f.index,y=df_f['Camas usadas para COVID'], name='Camas usadas para COVID',),
-    secondary_y=False
-)
+    secondary_y=False)
 fig.add_trace(
     go.Scatter(x=df_f.index,y=df_f['Falta de personal'],name='Falta de personal'),
-    secondary_y=False
-)
+    secondary_y=False)
 fig.add_trace(
     go.Scatter(x=df_f.index,y=df_f['Ocupacion UCI pediatrica'],name='Ocupacion UCI pediatrica'),
-    secondary_y=False
-)
+    secondary_y=False)
 fig.add_trace(
     go.Scatter(x=df_f.index,y=df_f['Ocupacion UCI adultos'],name='Ocupacion UCI adultos'),
-    secondary_y=False
-)
+    secondary_y=False)
 fig.add_trace(
     go.Scatter(x=df_f.index,y=df_f['Muertos por COVID'],name='Muertos por COVID'),  
-    secondary_y=True
-)
+    secondary_y=True)
 fig.update_layout(
     title_text="Variables asociadas a stress del servicio de salud durante la pandemia",title={
     'x':0.41,
-    'xanchor':'center'}
-)
+    'xanchor':'center'})
 fig.update_layout(
     autosize=False,
     width=900,
-    height=500,
-)
+    height=500,)
 # fig.update_xaxes(title_text=title)
 fig.update_yaxes(title_text="Cantidad", secondary_y=False)
 fig.update_yaxes(title_text="Muertes COVID", secondary_y=True)
 st.plotly_chart(fig)
 st.markdown('En el gráfico puede observarse que, por la conjunción de máximos de camas utilizadas para COVID, muertos por COVID y ocupacion de camas de cuidados intensivos, enero de 2021 fue el peor mes de la pandemia hasta ahora en EEUU')
+#------
 
+st.header('Recomendaciones y conclusiones')
+st.markdown("Algunas conclusiones y recomendaciones: \n- El dataset posee demasiadas inconsistencias. Sería optimo avanzar hacia una estandarizacion para el reporte de informacion vinculada a pandemias. Muchos campos brindan informacion redundante con respecto a otros y se puede observar en la descripcion de los mismos que muchos tomaron caracter de obligatorio apenas recientemente.\n- A priori, la correlación entre falta de personal y muertes parece ser escasa. Se destaca el estado de Nueva York, con escasos reportes de falta de personal y altos niveles de muertes, en comparacion con otros estados con reportes de falta de personal comparables.\n- Los peores momentos de ingresos y muertes pueden encontrarse en epoca invernal (Dic-Feb), por lo que se recomienda ajustar la capacidad hospitalaria especialmente para esas épocas, afectando una mayor dotacion de personal a servicio de guardias pasivas.\n- A partir del análisis de intervalos de crecimiento/decrecimiento para el estado de Nueva York, uno de los estados con mayor número de pacientes hospitalizados y de muertos por COVID, puede observarse que a partir de un pico de casos, la tasa de decrecimiento es alta y, a los 2 meses se observa una reducción de entre el 60% y el 85%. Esto puede servir para identificar oportunidades para redistribuir recursos y adecuar capacidad hospitalaria.")
