@@ -17,7 +17,11 @@ st.title('Informe COVID-19: pacientes y capacidad hospitalaria')
 
 @st.cache
 def LoadData():
+<<<<<<< HEAD
     file = pd.read_csv(r"COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
+=======
+    file = pd.read_csv(r"/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
+>>>>>>> 4a011362cf0c9160bb66d3395d520ee55e509131
     df = pd.DataFrame(file)
     df['date'] = pd.to_datetime(df['date'])
     return df
