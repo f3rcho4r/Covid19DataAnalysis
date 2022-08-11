@@ -13,6 +13,9 @@ pio.templates.default = "ggplot2"
 st.set_page_config(page_title="COVID-19: análisis de datos reportados de pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
 st.title('COVID-19: análisis de datos reportados de pacientes y capacidad hospitalaria')
 
+st.markdown('<b><u>Análisis</u>: Fernando Ashur Ramallo',unsafe_allow_html=True)
+st.markdown("<hr>",unsafe_allow_html=True)
+
 file = pd.read_csv(r"COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
 data = pd.DataFrame(file)
 df = data[['date','state','deaths_covid','inpatient_beds_used_covid','staffed_adult_icu_bed_occupancy','staffed_icu_adult_patients_confirmed_covid','staffed_icu_adult_patients_confirmed_and_suspected_covid']] 
@@ -106,7 +109,7 @@ if date_fin < date_ini:
 
 #-- Mainpage --
 st.title(":hospital: Dashboard situacional COVID-19 (EEUU)")
-  
+st.markdown("\n\n")  
 cols = ['date','state','Muertos por COVID','Camas comunes usadas para COVID', 'Camas UCI adultos usadas para COVID']
 df_sum = pd.DataFrame()
 df_sum[cols] = df[['date','state','deaths_covid','inpatient_beds_used_covid','staffed_icu_adult_patients_confirmed_and_suspected_covid']]
@@ -140,8 +143,9 @@ fig.update_layout(
     width=800,
     height=600,)
 st.plotly_chart(fig)
+st.markdown("<hr>",unsafe_allow_html=True)
 #------
-st.title('Uso de camas UCI por estado')
+st.header('Uso de camas UCI por estado')
 
 cols=['date','state','Muertes por COVID','staffed_adult_icu_bed_occupancy','staffed_icu_adult_patients_confirmed_covid']
 df_uci = pd.DataFrame()
@@ -172,17 +176,17 @@ with st.container():
         secondary_y=True
     )
     fig.update_layout(
-        title_text="Relacion entre % ocupacion UCI promedio y muertes en TOP5 estados por Ocupacion UCI"
+        title_text="Relacion entre (%) de ocupacion UCI (avg) y muertes en top 5 estados por Ocupacion UCI"
     )
     fig.update_xaxes(title_text="Estado")
-    fig.update_yaxes(title_text="<b>%", secondary_y=False)
-    fig.update_yaxes(title_text="<b>Muertes COVID", secondary_y=True)
+    fig.update_yaxes(title_text="% ocupacion", secondary_y=False)
+    fig.update_yaxes(title_text="Muertes COVID", secondary_y=True)
     st.plotly_chart(fig)
 
-
+st.markdown("<hr>",unsafe_allow_html=True)
 
 #------------------------------------------------------------------------------
-st.title('Ranking de estados por ocupación hospitalaria')
+st.header('Ranking de estados por ocupación hospitalaria')
 st.markdown('A continuación se muestra el top 10 de estados según su porcentaje de ocupacion hospitalaria promedio en el período de tiempo seleccionado')
 
 df_cap= data[['date','state','inpatient_bed_covid_utilization_numerator','adult_icu_bed_covid_utilization_numerator','inpatient_bed_covid_utilization_denominator','adult_icu_bed_covid_utilization_denominator']]
@@ -199,7 +203,7 @@ st.plotly_chart(fig)
 with st.expander("Ver ranking completo"):
     st.table(df_cap[['Estado','Ocupacion']])
 
-
+st.markdown("<hr>",unsafe_allow_html=True)
 st.header('Cantidad de camas ocupadas por COVID')
 with st.container():
     df_hosp_state = df[(df['date'].dt.date >=date_ini )&(df['date'].dt.date<=date_fin)].groupby(by='state').sum()

@@ -14,15 +14,18 @@ states_inverse = {v: k for k, v in states.items()}
 
 st.set_page_config(page_title="Informe COVID-19: pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
 st.title('Informe COVID-19: pacientes y capacidad hospitalaria')
-
+st.markdown("<hr>",unsafe_allow_html=True)
+st.markdown("<br>",unsafe_allow_html=True)
 @st.cache
 def LoadData():
     file = pd.read_csv(r"/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
     df = pd.DataFrame(file)
     df['date'] = pd.to_datetime(df['date'])
     return df
-
 df = LoadData()
+
+st.markdown('\n\n')
+
 
 st.header('5 Estados con mayor ocupación hospitalaria por COVID en los 6 primeros meses del 2020')
 st.markdown('Criterio de ocupación: por cama común, con pacientes confirmados')
@@ -33,10 +36,11 @@ top5 = df[df['date'].dt.date <= dt.date(2020,6,30)].groupby(by='state').sum().so
 top5.rename(columns={'inpatient_beds_used_covid':'Camas comunes usadas para pacientes COVID'},inplace=True)
 top5['Estado'] = top5.index.map(states)
 st.table(top5[['Estado','Camas comunes usadas para pacientes COVID']])
+st.markdown("<hr>",unsafe_allow_html=True)
+
 
 st.header("Ocupación de camas (común) por COVID en el Estado de Nueva York")
 st.markdown('Período comprendido desde el inicio de la pandemia (2020) hasta el 2022-08-02')
-
 #----
 #Genero un dataframe sólo con datos del estado de Nueva York
 df = LoadData()
@@ -74,7 +78,7 @@ with st.container():
 
     with col2:
         st.markdown('Se observa un ultimo período de crecimiento con un pico en el día 2022-01-12 y un nuevo minimo en el día 2022-03-26')
-
+st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header('TOP 5 estados que más camas UCI (Unidades de Cuidados Intensivos) utilizaron durante el año 2020')
 st.markdown('En términos absolutos.')
@@ -87,7 +91,7 @@ df_20['Estado'] = df_20.index.map(states)
 st.table(df_20.head(5)[['Estado','Camas UCI']])
 fig = px.pie(df_20.head(10), values='Camas UCI', names='Estado', title='Uso de camas UCI por estados, año 2020')
 st.plotly_chart(fig)
-
+st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header("Cantidad de camas utilizadas para pacientes pediátricos con COVID durante el 2020, por estado. ")
 #Genero un dataframe con datos de 2020
@@ -104,7 +108,7 @@ with st.expander('Ver ranking completo'):
 
 fig = px.bar(df_20.head(5),x='Estado',y='Camas pediatricas',color='Estado',title='Top 5 Estados por camas pediatricas COVID, 2020')
 st.plotly_chart(fig)
-
+st.markdown("<hr>",unsafe_allow_html=True)
 #----
 st.header("Porcentaje de camas UCI correspondendientes a casos confirmados de COVID, por estado")
 df_uci = df[['date','state','staffed_adult_icu_bed_occupancy','staffed_icu_adult_patients_confirmed_covid','staffed_icu_pediatric_patients_confirmed_covid','staffed_pediatric_icu_bed_occupancy']]
@@ -117,7 +121,7 @@ st.plotly_chart(fig)
 with st.expander('Ver ranking completo:'):
     st.table(df_uci['Porcentaje UCI'])
     st.markdown('Algunos estados no reportaron todos los datos considerados para este análisis en el período, por lo que figuran con valores NAN')
-
+st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header("Muertes por covid, por estado, durante el año 2021")
 df_21 = df[['date','state','critical_staffing_shortage_today_yes','deaths_covid']]
@@ -150,7 +154,7 @@ st.table(df_21.sort_values(by='Muertos por COVID',ascending=False)[['Estado','Mu
 
 with st.expander('Ver tabla completa'):
     st.table(df_21.sort_values(by='Muertos por COVID',ascending=False)[['Estado','Muertos por COVID']])
-
+st.markdown("<hr>",unsafe_allow_html=True)
 #---------------
 st.header('Relación entre falta de personal y muertes por COVID, año 2021')
 
@@ -211,6 +215,8 @@ fig.update_xaxes(title_text=title)
 fig.update_yaxes(title_text="Hospitales con falta de personal", secondary_y=False)
 fig.update_yaxes(title_text="Muertes COVID", secondary_y=True)
 st.plotly_chart(fig)
+st.markdown("<hr>",unsafe_allow_html=True)
+st.markdown("<br>",unsafe_allow_html=True)
 #----
 st.header('Peor mes de la pandemia para EEUU')
 cols = ['date','Camas usadas para COVID','Falta de personal','Muertos por COVID','Ocupacion UCI pediatrica','Ocupacion UCI adultos']
@@ -250,6 +256,6 @@ fig.update_yaxes(title_text="Muertes COVID", secondary_y=True)
 st.plotly_chart(fig)
 st.markdown('En el gráfico puede observarse que, por la conjunción de máximos de camas utilizadas para COVID, muertos por COVID y ocupacion de camas de cuidados intensivos, enero de 2021 fue el peor mes de la pandemia hasta ahora en EEUU')
 #------
-
+st.markdown("<hr>",unsafe_allow_html=True)
 st.header('Recomendaciones y conclusiones')
 st.markdown("Algunas conclusiones y recomendaciones: \n- El dataset posee demasiadas inconsistencias. Sería optimo avanzar hacia una estandarizacion para el reporte de informacion vinculada a pandemias. Muchos campos brindan informacion redundante con respecto a otros y se puede observar en la descripcion de los mismos que muchos tomaron caracter de obligatorio apenas recientemente.\n- A priori, la correlación entre falta de personal y muertes parece ser escasa. Se destaca el estado de Nueva York, con escasos reportes de falta de personal y altos niveles de muertes, en comparacion con otros estados con reportes de falta de personal comparables.\n- Los peores momentos de ingresos y muertes pueden encontrarse en epoca invernal (Dic-Feb), por lo que se recomienda ajustar la capacidad hospitalaria especialmente para esas épocas, afectando una mayor dotacion de personal a servicio de guardias pasivas.\n- A partir del análisis de intervalos de crecimiento/decrecimiento para el estado de Nueva York, uno de los estados con mayor número de pacientes hospitalizados y de muertos por COVID, puede observarse que a partir de un pico de casos, la tasa de decrecimiento es alta y, a los 2 meses se observa una reducción de entre el 60% y el 85%. Esto puede servir para identificar oportunidades para redistribuir recursos y adecuar capacidad hospitalaria.")
