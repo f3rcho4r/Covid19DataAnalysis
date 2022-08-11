@@ -59,7 +59,7 @@ with st.container():
     st.subheader('Segundo intervalo de crecimiento')
     col1, col2 = st.columns(2)
     with col1:
-        img=Image.open(r"../pages/ny_fecha2.png")
+        img=Image.open(r"./pages/ny_fecha2.png")
         st.image(img)
 
     with col2:
@@ -68,7 +68,7 @@ with st.container():
     st.subheader('Tercer intervalo de crecimiento')
     col1, col2 = st.columns(2)
     with col1:
-        img=Image.open(r"../pages/ny_fecha3.png")
+        img=Image.open(r"./pages/ny_fecha3.png")
         st.image(img)
 
     with col2:
