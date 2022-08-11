@@ -14,7 +14,7 @@ states_inverse = {v: k for k, v in states.items()}
 
 @st.cache
 def LoadData():
-    file = pd.read_csv(r"../COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
+    file = pd.read_csv(r"/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
     df = pd.DataFrame(file)
     df['date'] = pd.to_datetime(df['date'])
     return df
