@@ -16,12 +16,14 @@ st.set_page_config(page_title="Informe COVID-19: pacientes y capacidad hospitala
 st.title('Informe COVID-19: pacientes y capacidad hospitalaria')
 st.markdown("<hr>",unsafe_allow_html=True)
 st.markdown("<br>",unsafe_allow_html=True)
+
 @st.cache
 def LoadData():
-    file = pd.read_csv(r"/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
+    file = pd.read_csv(r"COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_State_Timeseries.csv",sep=',')
     df = pd.DataFrame(file)
     df['date'] = pd.to_datetime(df['date'])
     return df
+
 df = LoadData()
 
 st.markdown('\n\n')
@@ -43,13 +45,11 @@ st.header("Ocupación de camas (común) por COVID en el Estado de Nueva York")
 st.markdown('Período comprendido desde el inicio de la pandemia (2020) hasta el 2022-08-02')
 #----
 #Genero un dataframe sólo con datos del estado de Nueva York
-df = LoadData()
 df_ny = df[df['state'] == 'NY']
 df_ny = df_ny.sort_values(by='date')
 
 fig = px.line(df_ny,x='date',y='inpatient_beds_used_covid')
 st.plotly_chart(fig)
-
 
 with st.container():
     st.subheader('Primer intervalo de crecimiento')
@@ -82,6 +82,7 @@ st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header('TOP 5 estados que más camas UCI (Unidades de Cuidados Intensivos) utilizaron durante el año 2020')
 st.markdown('En términos absolutos.')
+
 #Genero un dataframe con datos de 2020
 df_20 = df[df['date'].dt.date < dt.date(2021,1,1)]
 df_20['Camas UCI'] = df_20['staffed_adult_icu_bed_occupancy'] + df_20['staffed_pediatric_icu_bed_occupancy']
@@ -94,6 +95,7 @@ st.plotly_chart(fig)
 st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header("Cantidad de camas utilizadas para pacientes pediátricos con COVID durante el 2020, por estado. ")
+
 #Genero un dataframe con datos de 2020
 df_20 = df[df['date'].dt.date < dt.date(2021,1,1)]
 #Renombro columna para mostrar en tabla
