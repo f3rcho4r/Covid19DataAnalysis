@@ -1,5 +1,4 @@
 import streamlit as st
-st.set_page_config(page_title="Informe COVID-19: pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
 import pandas as pd
 import os
 import datetime as dt
