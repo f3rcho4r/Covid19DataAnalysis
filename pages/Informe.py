@@ -12,10 +12,6 @@ import plotly.io as pio
 pio.templates.default = "plotly"
 states_inverse = {v: k for k, v in states.items()}
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 940c787f4d74c0ccc51758d6384dc566b1f723fb
 st.title('Informe COVID-19: pacientes y capacidad hospitalaria')
 st.markdown("<hr>",unsafe_allow_html=True)
 st.markdown("<br>",unsafe_allow_html=True)
