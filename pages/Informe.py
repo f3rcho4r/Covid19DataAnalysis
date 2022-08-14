@@ -1,6 +1,6 @@
+from turtle import width
 import streamlit as st
 import pandas as pd
-import os
 import datetime as dt
 import plotly.express as px
 import plotly.graph_objects as go
@@ -12,7 +12,6 @@ import plotly.io as pio
 pio.templates.default = "plotly"
 states_inverse = {v: k for k, v in states.items()}
 
-st.set_page_config(page_title="Informe COVID-19: pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
 st.title('Informe COVID-19: pacientes y capacidad hospitalaria')
 st.markdown("<hr>",unsafe_allow_html=True)
 st.markdown("<br>",unsafe_allow_html=True)
@@ -89,9 +88,19 @@ df_20['Camas UCI'] = df_20['staffed_adult_icu_bed_occupancy'] + df_20['staffed_p
 df_20 = df_20.groupby(by='state').sum().sort_values(by='Camas UCI',ascending=False)
 df_20['Estado'] = df_20.index.map(states)
 
-st.table(df_20.head(5)[['Estado','Camas UCI']])
-fig = px.pie(df_20.head(10), values='Camas UCI', names='Estado', title='Uso de camas UCI por estados, año 2020')
-st.plotly_chart(fig)
+col1,col2,col3 = st.columns(3)
+with col1:
+    fig = px.pie(df_20.head(5), values='Camas UCI', names='Estado', title='Uso de camas UCI por estados, año 2020')
+    fig.update_layout(margin_autoexpand=True,width=450)
+    st.plotly_chart(fig)
+with col2:
+    st.empty()
+with col3:
+    st.markdown("<br><br><br>",unsafe_allow_html=True)
+    st.table(df_20.head(5)[['Estado','Camas UCI']])
+    
+
+
 st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header("Cantidad de camas utilizadas para pacientes pediátricos con COVID durante el 2020, por estado. ")
@@ -104,12 +113,28 @@ df_20.rename(columns={'total_pediatric_patients_hospitalized_confirmed_and_suspe
 df_20 = df_20.groupby(by='state').sum().sort_values(by='Camas pediatricas',ascending=False)
 #Mapeo códigos de estado a nombres para mostrar
 df_20['Estado'] = df_20.index.map(states)
-st.table(df_20['Camas pediatricas'].head(5))
-with st.expander('Ver ranking completo'):
-    st.table(df_20['Camas pediatricas'])
 
-fig = px.bar(df_20.head(5),x='Estado',y='Camas pediatricas',color='Estado',title='Top 5 Estados por camas pediatricas COVID, 2020')
-st.plotly_chart(fig)
+
+col1,col2,col3 = st.columns(3)
+with col1:
+    st.empty()
+with col2:
+    st.markdown("<br>",unsafe_allow_html=True)  
+    st.table(df_20[['Estado','Camas pediatricas']].astype({'Estado':'str','Camas pediatricas':'int'}).head(5))
+    with st.expander('Ver ranking completo'):
+        st.table(df_20['Camas pediatricas'])
+with col3:
+    st.empty()
+
+col1,col2 = st.columns(2)
+with col1:
+    fig = px.bar(df_20.head(5),x='Estado',y='Camas pediatricas',color='Estado',title='Top 5 Estados por camas pediatricas COVID, 2020')
+    fig.update_layout(width=860,title_x=0.5)
+    st.plotly_chart(fig) 
+with col2:
+    st.empty()
+
+
 st.markdown("<hr>",unsafe_allow_html=True)
 #----
 st.header("Porcentaje de camas UCI correspondendientes a casos confirmados de COVID, por estado")
@@ -118,11 +143,24 @@ df_uci['Porcentaje UCI'] = (df_uci['staffed_icu_adult_patients_confirmed_covid']
 df_uci= df_uci.groupby(by='state').mean().sort_values(by='Porcentaje UCI', ascending=False)
 df_uci['Estado'] = df_uci.index.map(states)
 
-fig = px.bar(df_uci.head(5),x='Estado',y='Porcentaje UCI',color='Estado',color_continuous_scale="sunset")
-st.plotly_chart(fig)
-with st.expander('Ver ranking completo:'):
-    st.table(df_uci['Porcentaje UCI'])
-    st.markdown('Algunos estados no reportaron todos los datos considerados para este análisis en el período, por lo que figuran con valores NAN')
+col1,col2 = st.columns(2)
+with col1:
+    fig = px.bar(df_uci.head(5),x='Estado',y='Porcentaje UCI',color='Estado',color_continuous_scale="sunset")
+    fig.update_layout(width=860)
+    st.plotly_chart(fig)
+with col2:
+    st.empty()
+
+col1,col2,col3 = st.columns(3)
+with col1:
+    st.empty()
+with col2:
+    with st.expander('Ver ranking completo:'):
+        st.table(df_uci['Porcentaje UCI'])
+        st.markdown('Algunos estados no reportaron todos los datos considerados para este análisis en el período, por lo que figuran con valores NAN')
+with col3:
+    st.empty()
+
 st.markdown("<hr>",unsafe_allow_html=True)
 #---
 st.header("Muertes por covid, por estado, durante el año 2021")
@@ -142,8 +180,8 @@ fig = px.choropleth(df_21,
                     )
                 
 fig.update_layout(
-    width=800,
-    height=600,)
+    width=860,
+    height=540,)
 fig.update_layout(title='Muertos por COVID en 2021',
                  font={'size':14})
 fig.update_layout(title={
@@ -151,11 +189,16 @@ fig.update_layout(title={
     'xanchor':'center'
 })
 st.plotly_chart(fig)
-st.table(df_21.sort_values(by='Muertos por COVID',ascending=False)[['Estado','Muertos por COVID']].head(5))
+col1,col2,col3 = st.columns(3)
+with col1:
+    st.empty()
+with col2:
+    st.table(df_21.sort_values(by='Muertos por COVID',ascending=False)[['Estado','Muertos por COVID']].head(5))
+    with st.expander('Ver tabla completa'):
+        st.table(df_21.sort_values(by='Muertos por COVID',ascending=False)[['Estado','Muertos por COVID']])
+with col3:
+    st.empty()
 
-
-with st.expander('Ver tabla completa'):
-    st.table(df_21.sort_values(by='Muertos por COVID',ascending=False)[['Estado','Muertos por COVID']])
 st.markdown("<hr>",unsafe_allow_html=True)
 #---------------
 st.header('Relación entre falta de personal y muertes por COVID, año 2021')
