@@ -1,4 +1,5 @@
 import streamlit as st
+st.set_page_config(page_title="COVID-19: análisis de datos reportados de pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -9,8 +10,6 @@ from plotly.subplots import make_subplots
 
 
 pio.templates.default = "ggplot2"
-
-st.set_page_config(page_title="COVID-19: análisis de datos reportados de pacientes y capacidad hospitalaria",page_icon=':bar_chart:',layout='wide')
 st.title('COVID-19: análisis de datos reportados de pacientes y capacidad hospitalaria')
 
 st.markdown('<b><u>Análisis</u>: Fernando Ashur Ramallo',unsafe_allow_html=True)
