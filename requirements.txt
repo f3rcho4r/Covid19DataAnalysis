@@ -10,7 +10,7 @@ bleach==5.0.1
 blinker==1.5
 cachetools==5.2.0
 calmap==0.0.9
-certifi==2022.6.15
+certifi==2023.7.22
 cffi==1.15.1
 charset-normalizer==2.1.0
 click==8.1.3
